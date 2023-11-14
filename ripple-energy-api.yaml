@@ -1,0 +1,214 @@
+openapi: '3.0.2'
+
+info:
+  title: Ripple Energy API
+  version: '1.0'
+  description: |
+    OpenAPI spec version of the Ripple Energy API described on their website here <a href="https://community.rippleenergy.com/new-feature-requests-yyqtfatb/post/ripple-api-yH0cTzuQ4GJMaYV" target="_blank">https://community.rippleenergy.com/new-feature-requests-yyqtfatb/post/ripple-api-yH0cTzuQ4GJMaYV</a>.
+
+    Why? Because although Ripple Energy have given brief documentation about their API, it's not using OpenAPI spec and therefore you cannot use tooling to
+      automatically generate client libraries for it. This means everyone creates custom code to interface with their API.
+
+    Although the endpoints have been described using OpenAPI spec, the API is not really a REST API (doesn't return an HTTP status codes for error scenarios).
+
+servers:
+  - url: https://rippleenergy.com/rest
+    description: Production server
+
+components:
+  schemas:
+    NotAuthenticated:
+      type: object
+      properties:
+        error:
+          type: string
+    MemberDataResponse:
+      type: object
+      properties:
+        email:
+          type: string
+        copyright_notice:
+          type: string
+        generation_assets:
+          type: array
+          items: 
+            $ref: '#/components/schemas/GenerationAsset'
+    GenerationAsset:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+        total_capacity:
+          type: number
+          format: double
+        total_capacity_units:
+          type: string
+        member_capacity:
+          type: number
+          format: double
+        member_capacity_units:
+          type: string
+        member_expected_annual_generation:
+          type: number
+          format: double
+        member_expected_annual_generation_units:
+          type: string
+        generation:
+          type: object
+          $ref: '#/components/schemas/Generation'
+        forecast:
+          type: array
+          items:
+            $ref: '#/components/schemas/Forecast'
+    Generation:
+      type: object
+      properties:
+        generation_unit:
+          type: string
+        latest_telemetry:
+          type: object
+          $ref: '#/components/schemas/LatestTelemetry'
+        latest:
+          type: object
+          $ref: '#/components/schemas/Latest'
+        today:
+          type: object
+          $ref: '#/components/schemas/PeriodGenerationEarnings'
+        yesterday:
+          type: object
+          $ref: '#/components/schemas/PeriodGenerationEarnings'
+        this_week:
+          type: object
+          $ref: '#/components/schemas/PeriodGenerationEarnings'
+        last_week:
+          type: object
+          $ref: '#/components/schemas/PeriodGenerationEarnings'
+        this_month:
+          type: object
+          $ref: '#/components/schemas/PeriodGenerationEarnings'
+        last_month:
+          type: object
+          $ref: '#/components/schemas/PeriodGenerationEarnings'
+        this_year:
+          type: object
+          $ref: '#/components/schemas/PeriodGenerationEarnings'
+        last_year:
+          type: object
+          $ref: '#/components/schemas/PeriodGenerationEarnings'
+        total:
+          type: object
+          $ref: '#/components/schemas/PeriodGenerationEarnings'
+    LatestTelemetry:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        wind_speed_avg:
+          type: number
+          format: double
+        generator_speed_avg:
+          type: number
+          format: double
+        blade_angle_avg:
+          type: number
+          format: double
+        nacelle_position:
+          type: number
+          format: double
+        tower_base_temp_avg:
+          type: number
+          format: double
+        ambient_temp_max:
+          type: number
+          format: double
+    Latest:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        generation:
+          type: number
+          format: double
+        estimated_savings:
+          type: number
+          format: double
+        estimated_savings_units:
+          type: string
+    PeriodGenerationEarnings:
+      type: object
+      properties:
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
+        contains_estimate:
+          type: boolean
+        generated:
+          type: number
+          format: double
+        earned:
+          type: number
+          format: double
+    Forecast:
+      type: object
+      properties:
+        period:
+          type: string
+          format: date-time
+        generation:
+          type: number
+          format: double
+        estimated_savings:
+          type: number
+          format: double
+        estimated_savings_units:
+          type: string
+
+paths:
+  /member_data/{apiKey}:
+    get:
+      summary: Get member data
+      description: |
+        See description on Ripple Energy's post <a href="https://community.rippleenergy.com/new-feature-requests-yyqtfatb/post/ripple-api-yH0cTzuQ4GJMaYV" target="_blank">https://community.rippleenergy.com/new-feature-requests-yyqtfatb/post/ripple-api-yH0cTzuQ4GJMaYV</a>.
+      parameters:
+        - name: apiKey
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberDataResponse'
+  /reset_api_key/{apiKey}:
+    get:
+      summary: Resets your API Key
+      description: |
+        See description on Ripple Energy's post <a href="https://community.rippleenergy.com/new-feature-requests-yyqtfatb/post/ripple-api-yH0cTzuQ4GJMaYV" target="_blank">https://community.rippleenergy.com/new-feature-requests-yyqtfatb/post/ripple-api-yH0cTzuQ4GJMaYV</a>.
+      parameters:
+        - name: apiKey
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
